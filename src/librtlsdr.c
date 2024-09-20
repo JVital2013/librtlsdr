@@ -1529,6 +1529,13 @@ int rtlsdr_open(rtlsdr_dev_t **out_dev, uint32_t index)
 		goto err;
 	}
 
+	/* Windows: Use RAW_IO to improve throughput */
+//#if LIBUSB_API_VERSION >= 0x0100010B
+	if(libusb_endpoint_supports_raw_io(dev->devh, 0x81) == 1) {
+		printf("Return code: %d\n", libusb_endpoint_set_raw_io(dev->devh, 0x81, 1));
+	}
+//#endif
+
 	dev->rtl_xtal = DEF_RTL_XTAL_FREQ;
 
 	/* perform a dummy write, if it fails, reset the device */
